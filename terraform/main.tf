@@ -84,10 +84,3 @@ resource "aws_iam_role" "eks_role" {
   
 }
 
-terraform {
-  backend "s3" {
-    bucket = "your-terraform-state-bucket"
-    key    = "app-repo/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
