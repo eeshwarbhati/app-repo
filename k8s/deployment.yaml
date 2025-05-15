@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flask-app
-  namespace: default
+name: flask-app
+namespace: default
 spec:
   replicas: 3
   selector:
@@ -14,28 +14,23 @@ spec:
         app: flask-app
     spec:
       containers:
-      - name: flask-app
-        image: ghcr.io/yourusername/flask-app:latest
-        ports:
-        - containerPort: 5000
-        env:
-        - name: DB_NAME
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: db_name
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: db_user
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: db_password
-        - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: db_host
+        - name: flask-app
+          image: ghcr.io/eeshwarbhati/flask-app:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-password
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-host
