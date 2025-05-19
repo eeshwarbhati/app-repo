@@ -1,28 +1,23 @@
-name: CI/CD Pipeline
+name: CI/CD pipeline
 on:
   push:
     branches:
       - main
-      job: 
-      build-and-deploy:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v3
-
-          - name: Build Docker image
-            run: docker build -t ghcr.io/eeshwarbhati/flask-app:${{ github.sha }} ./app
-            - name: Push to GHCR
-            run: |
-              echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-              docker push ghcr.io/eeshwarbhati/flask-app:${{ github.sha }}
-
-              - name: Deploy to EKS
-              uses: aws-actions/configure-aws-credentials@v1
-              with:
-                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                aws-region: us-east-1
-                - name: UpdateKubernetes
-                run: |
-                  kubectl set image deployment/flask-app flask-app=ghcr.io/eeshwarbhati/flask-app:${{ github.sha }} -n default
+jobs:
+  build and deploy:
+    runs-om: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build Docker image
+      run: |
+        echo ${{secret.GHCR_TOKEN}} | docker login ghcr.io -u ${{github.actor}} --password-stdin
+        docker push ghcr.io/eeshwarbhati/flask-app:${{github.sha}}
+    - name: Deploy to EKS
+      uses: aws-action/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+        aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        aws-region: us-east-1
+        - name: Update Kubernetes
+        run: |
+        kubectl set image deployment/flask-app flask-app=ghcr.io/eeshwarbhati/flask-app:${{github.sha}}
