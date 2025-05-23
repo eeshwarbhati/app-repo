@@ -1,5 +1,5 @@
 output "eks_cluster_endpoint" {
-    value = aws_eks_cluster.app_cluster.endpoint
+    value = aws_eks_cluster.app-cluster.endpoint
 
 }
 
