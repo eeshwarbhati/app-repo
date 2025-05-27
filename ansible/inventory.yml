@@ -1,0 +1,6 @@
+all:
+  children:
+    on-prem: 1
+      hosts:
+        localhost:
+          ansible_connection: local

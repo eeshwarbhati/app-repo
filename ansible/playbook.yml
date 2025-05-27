@@ -2,24 +2,49 @@
 - hosts: on_prem
   become: yes
   tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
     - name: Install Docker
       apt:
         name: docker.io
         state: present
-        update_cache: yes
     - name: Start Docker service
       service:
-        name: Docker
+        name: docker
         state: started
         enabled: yes
-
     - name: Install Git
       apt:
-        name: Git
+        name: git
         state: present
-        update_cache: yes
     - name: Clone repository
       git:
         repo: 'https://github.com/eeshwarbhati/app-repo.git'
         dest: /app
         version: main
+
+- hosts: aws_nodes
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+    - name: Install kubectl
+      shell: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        mv kubectl /usr/local/bin/
+    - name: Install Vault agent
+      get_url:
+        url: https://releases.hashicorp.com/vault/1.13.0/vault_1.13.0_linux_amd64.zip
+        dest: /tmp/vault.zip
+    - name: Unzip Vault
+      unarchive:
+        src: /tmp/vault.zip
+        dest: /usr/local/bin/
+        remote_src: yes
+    - name: Configure Vault agent
+      template:
+        src: vault-agent.hcl.j2
+        dest: /etc/vault/vault-agent.hcl
