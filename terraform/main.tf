@@ -77,6 +77,7 @@ resource "aws_security_group" "eks_sg" {
   tags = { Name = "eks-sg" }
 }
 
+
 resource "aws_iam_role" "eks_role" {
   name = "eks-cluster-role"
   assume_role_policy = jsonencode({
@@ -108,9 +109,9 @@ resource "aws_iam_role" "node_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action    = "sts:AssumeRole"
       Effect    = "Allow"
       Principal = { Service = "ec2.amazonaws.com" }
+      Action    = "sts:AssumeRole"
     }]
   })
 }
@@ -137,11 +138,14 @@ resource "aws_eks_node_group" "app_nodes" {
   }
   instance_types = ["t3.medium"]
 }
-
+resource "aws_iam_role_policy_attachment" "node_ecr_policy" {
+  role       = aws_iam_role.node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
 resource "aws_db_instance" "app_db" {
   identifier           = "app-db"
   engine              = "postgres"
-  engine_version      = "13.7"
+  engine_version      = "13.15"
   instance_class      = "db.t3.micro"
   allocated_storage   = 20
   username            = "appuser"
@@ -158,3 +162,6 @@ variable "db_password" {
   sensitive   = true
 }
 
+output "eks_cluster_endpoint" {
+  value = aws_eks_cluster.app_cluster.endpoint
+}
